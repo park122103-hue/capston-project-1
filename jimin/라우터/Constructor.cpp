@@ -11,6 +11,8 @@ QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, in
     setGlist(gates);
     setGrid();
     // for mapping
+    l2p.assign(num_lq, -1);
+    p2l.assign(num_pq, -1);
     for (int Q_cand = 0; Q_cand < num_pq; Q_cand++) {  // about physical
         double sum = 0.0;
         for (int Q_other = 0; Q_other < num_pq; Q_other++) {
