@@ -51,7 +51,7 @@ class Router {
 public:
     Router ();
     void pull(int q_self, int now);
-    void fatch_from_Glist(int q_self);
+    void fatch(int q_self);
     double getCostOH(int Q_self, int Q_other, double param_alpha = 0.8);
     std::vector<std::pair<int, int>> routing();
     void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead);
