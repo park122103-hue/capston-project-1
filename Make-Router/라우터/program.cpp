@@ -1,33 +1,22 @@
-#include <iostream>
-#include <vector>
-#include "Quantum_circuit.h"
-using namespace std;
-
-
 int main() {
-    QCompiler qc1();
+    // 1. 테스트 회로 게이트
+    vector<pair<int, int>> qc = {
+        {0, 1}, {0, 2}, {1, 2}, {2, 3}, {0, 1}
+    };
+    // 2. 5큐비트 T자형 칩 커플링 간선
+    vector<pair<int, int>> edge = {
+        {0, 1}, {1, 2}, {1, 3}, {3, 4}
+    };
+    // 3. 컴파일러 객체 생성 (4 논리 큐비트, 5 물리 노드)
+    QCompiler qc1(4, 5, qc, edge);
+    // 4. 라우팅 실행
     vector<pair<int, int>> v = qc1.routing();
+    cout << "Total routed operations: " << v.size() << endl;
     for (pair<int, int> g : v) {
-        if (g.first == 0 || g.second == 0)
-            cout << "C ";
-        else
-            cout << "| ";
-        if (g.first == 1 || g.second == 1)
-            cout << "C ";
-        else
-            cout << "| ";
-        if (g.first == 2 || g.second == 2)
-            cout << "C ";
-        else
-            cout << "| ";
-        if (g.first == 3 || g.second == 3)
-            cout << "C ";
-        else
-            cout << "| ";
-        if (g.first == 4 || g.second == 4)
-            cout << "C ";
-        else
-            cout << "| ";
+        for (int q = 0; q < 5; q++) {
+            if (g.first == q || g.second == q) cout << "C ";
+            else cout << "| ";
+        }
         cout << endl;
     }
     return 0;
