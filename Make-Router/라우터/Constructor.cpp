@@ -7,8 +7,8 @@ QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, in
     // 
     T = 10;
     param_alpha = 0.8;
-    setDist();
     setAdj(edge);
+    setDist();
     setGlist(qc);
     setGrid();
     // for mapping
