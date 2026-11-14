@@ -25,14 +25,14 @@ class QCompiler {
 	std::vector<double> importance;  // 논리 큐비트의 중요도(~가중치)
 	std::vector<int> centrality;  // 물리 큐비트의 중심도(~거리)
     // For constructor
+    void setAdj(const std::vector<std::pair<int, int>>& edge);
     void setDist();
-    void setAdj();
     void setGlist(const std::vector<std::pair<int, int>>& gates);
     void setGrid();
     // Damping ratio
     double param_alpha = 0.8;
 public:
-    QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& gates);
+    QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& gates, const std::vector<std::pair<int, int>>& edge);
 
 	// 내부 탐색 메서드
 	double getAffinity(int q_cand) const;  // 논리 큐비트의 친밀도(~가중치)

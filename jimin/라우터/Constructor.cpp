@@ -1,14 +1,15 @@
 #include <vector>
+#include <queue>
 #include "Quantum_circuit.h"
 
-QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& gates)
+QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& qc, const std::vector<std::pair<int, int>>& edge)
  : num_lq(num_lq), num_pq(num_pq) {
     // 
     T = 10;
     param_alpha = 0.8;
     setDist();
-    setAdj();
-    setGlist(gates);
+    setAdj(edge);
+    setGlist(qc);
     setGrid();
     // for mapping
     l2p.assign(num_lq, -1);
@@ -36,13 +37,37 @@ QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, in
     }
 }
 
+
+
+void QCompiler::setAdj(const std::vector<std::pair<int, int>>& edge) {
+    adj.assign(num_pq, std::vector<int>());
+    for (std::pair<int, int> e : edge) {
+        adj[e.first].push_back(e.second);
+        adj[e.second].push_back(e.first); // 양방향
+    }
+}
+
 void QCompiler::setDist() {
+    // 거리를 구하는 BFS 시작...
+    for (int i = 0; i < num_pq; i++) {
+        std::queue<int> q;
+        // 시작
+        dist[i][i] = 0;
+        q.push(i);
+        // 계속
+        while (!q.empty()) {
+            int v = q.front();
+            q.pop();
 
+            for (const int w : adj[v]) {
+                if (dist[i][w] != -1) continue;
+                dist[i][w] = dist[i][v] + 1;
+                q.push(w);
+            }
+        }
+    }
 }
 
-void QCompiler::setAdj() {
-
-}
 
 void QCompiler::setGlist(const std::vector<std::pair<int, int>>& gates) {
     top.assign(num_lq, 0);
