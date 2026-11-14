@@ -3,8 +3,8 @@
 
 
 struct G {
-    int branch;
-    int gate_id;
+    int other;
+    int id;
 };
 
 // l2p, p2l, Glist, dist, adj ...
@@ -42,19 +42,18 @@ class Router {
     // G_Look_ahaed[qx][t]=bubble(-1)일 때, qx에 대해 상대 시간 t에서 게이트가 없다는 뜻.
     const int num_lq = 4;
     const int T = 10;
-    std::vector<std::vector<int>> qc_Look_ahaed = {
+    std::vector<std::vector<int>> grid = {
         { 1, 2, 1, -1, -1, -1, -1, -1, -1, -1 },
         { 0, -1, 0, 2, -1, -1, -1, -1, -1, -1 },
         { -1, 0, 3, 1, -1, -1, -1, -1, -1, -1 },
         { -1, -1, 2, -1, -1, -1, -1, -1, -1, -1 }
     };
-    // 그리고 상대시간 t와 별개로 절대시간 t_abs도 있어야 해.
 public:
     Router ();
-    void pull(int logic_qubit, int now);
-    void fatch_from_Glist(int logic_qubit);
-    double getCostOH(int logic_qubit_A, int physical_qubit_B, double alpha = 0.8);
+    void pull(int q_self, int now);
+    void fatch_from_Glist(int q_self);
+    double getCostOH(int Q_self, int Q_other, double param_alpha = 0.8);
     std::vector<std::pair<int, int>> routing();
-    void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_count);
+    void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead);
     bool doGate(std::vector<std::pair<int, int>>& routed_gate);
 };
