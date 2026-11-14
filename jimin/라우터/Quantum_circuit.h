@@ -35,11 +35,6 @@ class Router {
     std::vector<int> l2p = { 0, 1, 2, 3 };
     std::vector<int> p2l = { 0, 1, 2, 3, -1 };
 
-
-    // CostOH, pull, fatch_from_Glist, routing에는 bg_buff 필요하지. -> 이름 뭐로하지? bg_buff 마음에 안드는데.
-    // 사실상 클래스 모두가 사용하는구나.
-    // G_Look_ahaed[qx][t]=qx일 때, qx에 대해 상대 시간 t에서 게이트는 cx qx,qy라는 뜻.
-    // G_Look_ahaed[qx][t]=bubble(-1)일 때, qx에 대해 상대 시간 t에서 게이트가 없다는 뜻.
     const int num_lq = 4;
     const int T = 10;
     std::vector<std::vector<int>> grid = {
