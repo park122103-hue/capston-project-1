@@ -1,10 +1,8 @@
 #include <vector>
 #include "Quantum_circuit.h"
 
-Router::Router () {}
-
 // 전부 당기기+Glist에서 당겨오기까지.
-void Router::pull(int q_self, int now) {
+void QCompiler::pull(int q_self, int now) {
 	if (grid[q_self][now] != -1) return;  // 오류 방지
 	if (now + 1 == T) {  // 만약 (비어있는)현재의 격자가 grid의 끝이라면 grid를 갱신한다
         fatch(q_self);
@@ -25,7 +23,7 @@ void Router::pull(int q_self, int now) {
 }
 
 // q_self의 다음 게이트를 Glist에서 당겨오기
-void Router::fatch(int q_self) {
+void QCompiler::fatch(int q_self) {
 	if (grid[q_self][T - 1] != -1) return;  // 오류 방지
     if (top[q_self] >= Glist[q_self].size()) return;  // 만약 패치할 것이 Glist에 남아있지 않으면 return;
 	int q_other = Glist[q_self][top[q_self]].other;
@@ -38,19 +36,19 @@ void Router::fatch(int q_self) {
 	top[q_other]++;
 }
 
-double Router::getCostOH(int Q_self, int Q_cand, double param_alpha) {
+double QCompiler::getCostOH(int Q_self, int Q_cand) {
 	if (p2l[Q_self] == -1) return 0.0;  // 빈 노드는 큐비트간 거리 계산을 할 필요 없으므로 비용 = 0;
 	double power = 1.0;
 	double overhead = 0.0;
 	int q_self = p2l[Q_self];
-	// BGbuf[q0]에 해당하는 q1에 대해서 순회.
+	// grid[q_self]에 해당하는 q1에 대해서 순회.
 	for (int t = 0; t < T; t++) {
-		if (grid[p2l[Q_self]][t] == -1) {
+		if (grid[q_self][t] == -1) {
 			power *= param_alpha;
 			continue;
 		}
 		int Q_other = l2p[grid[q_self][t]];
-		if (p2l[Q_other] != -1 && Q_other != Q_cand) {  // ohter 큐비트와 스왑하는 경우 당연히 거리 변화량은 0이라서 스킵해도 됨
+		if (Q_other != Q_cand) {  // ohter 큐비트와 스왑하는 경우 당연히 거리 변화량은 0이라서 스킵해도 됨
 			overhead += power * (dist[Q_cand][Q_other] - dist[Q_self][Q_other]);
 		}
 		power *= param_alpha;
@@ -58,7 +56,7 @@ double Router::getCostOH(int Q_self, int Q_cand, double param_alpha) {
 	return overhead;
 }
 
-std::vector<std::pair<int, int>> Router::routing() {
+std::vector<std::pair<int, int>> QCompiler::routing() {
     // 결과내기
     std::vector<std::pair<int, int>> routed_gate;
     int swap_overhead = 0;
@@ -75,7 +73,7 @@ std::vector<std::pair<int, int>> Router::routing() {
 	return routed_gate;
 }
 
-void Router::doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead) {
+void QCompiler::doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead) {
 	int best_Q_self = -1;
 	int best_Q_cand = -1;
 	double best_swap_overhead = 1e9;
@@ -106,7 +104,7 @@ void Router::doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_ove
 	swap_overhead++;
 }
 
-bool Router::doGate(std::vector<std::pair<int, int>>& routed_gate) {
+bool QCompiler::doGate(std::vector<std::pair<int, int>>& routed_gate) {
 	for (int q_self = 0; q_self < num_lq; q_self++) {
 		if (grid[q_self][0] == -1) continue;
 		int q_other = grid[q_self][0];

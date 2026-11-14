@@ -5,7 +5,7 @@ using namespace std;
 
 
 int main() {
-    Router qc1;
+    QCompiler qc1();
     vector<pair<int, int>> v = qc1.routing();
     for (pair<int, int> g : v) {
         if (g.first == 0 || g.second == 0)
