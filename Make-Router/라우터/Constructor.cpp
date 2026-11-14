@@ -48,6 +48,7 @@ void QCompiler::setAdj(const std::vector<std::pair<int, int>>& edge) {
 }
 
 void QCompiler::setDist() {
+    dist.assign(num_pq, std::vector<int>(num_pq, -1));
     // 거리를 구하는 BFS 시작...
     for (int i = 0; i < num_pq; i++) {
         std::queue<int> q;
