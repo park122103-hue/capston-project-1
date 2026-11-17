@@ -17,6 +17,7 @@ int main() {
     QCompiler qc1(4, 5, qc, edge);
 
     // 4. 라우팅 실행
+    qc1.mapping();
     vector<pair<int, int>> v = qc1.routing();
     cout << "Total routed operations: " << v.size() << endl;
 
