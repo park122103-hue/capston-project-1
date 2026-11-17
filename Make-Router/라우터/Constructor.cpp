@@ -96,7 +96,7 @@ void QCompiler::setGrid() {
             if (grid[q_self].size() >= T || grid[q_other].size() >= T) continue;
             // push bubble
             if (grid[q_self].size() < grid[q_other].size()) grid[q_self].resize(grid[q_other].size(), -1);
-            while (grid[q_other].size() < grid[q_self].size()) grid[q_other].push_back(-1);
+            if (grid[q_self].size() > grid[q_other].size()) grid[q_other].resize(grid[q_self].size(), -1);
             // push gate
             grid[q_self].push_back(q_other);
             grid[q_other].push_back(q_self);
