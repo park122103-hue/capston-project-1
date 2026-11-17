@@ -1,6 +1,19 @@
+/*
+* input: 
+* 논리 큐빗 수(num_lq)
+* 물리 큐빗 수(num_pq)
+* cx gate의 큐빗 쌍들(ex. qc = { {q0,q1}, {q0,q2}, ... })
+* 물리 노드의 간선(ex.edge = { {0,1}, {1,0}, {1,2}, {2,1}, ... }
+* output: 
+* 매핑(l2p, p2l)
+* 라우팅(routed_qc) <-- 반환형 미확정
+* =================================
+* 이러한 컴파일의 전단계에 대하여 하나의 클래스를 사용할 것이다.
+* 이 헤더 파일은 그러한 클래스의 정의부이다.
+*/
+
 #pragma once
 #include <vector>
-
 
 struct G {
     int other;
@@ -32,7 +45,7 @@ class QCompiler {
     // Damping ratio
     double param_alpha = 0.8;
 public:
-    QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& gates, const std::vector<std::pair<int, int>>& edge);
+    QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& qc, const std::vector<std::pair<int, int>>& edge);
 
 	// 내부 탐색 메서드
 	double getAffinity(int q_cand) const;  // 논리 큐비트의 친밀도(~가중치)
