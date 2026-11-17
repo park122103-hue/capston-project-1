@@ -1,5 +1,13 @@
-﻿#include <vector>
-#include "Quantum_circuit.h"
+/*
+* initial_mapper.cpp
+* initial_mapper.cpp
+* initial_mapper.cpp
+* 원래 AQubits_log.cpp 였던 코드를 약간 수정해서 재활용한 버전이다.
+* 당연하게도 매핑을 위한 모든 함수와 매핑 함수가 있는 코드이다.
+*/
+
+#include <vector>
+#include "QCompiler.h"
 
 using namespace std;
 
