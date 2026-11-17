@@ -1,5 +1,9 @@
+/*
+* 라우터를 위한 각종 함수들과 라우터
+*/
+
 #include <vector>
-#include "Quantum_circuit.h"
+#include "QCompiler.h"
 
 // 전부 당기기+Glist에서 당겨오기까지.
 void QCompiler::pull(int q_self, int now) {
