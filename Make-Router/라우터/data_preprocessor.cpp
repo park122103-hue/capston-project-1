@@ -1,6 +1,23 @@
+/*
+* input: 
+* 논리 큐빗 수(num_lq)
+* 물리 큐빗 수(num_pq)
+* cx gate의 큐빗 쌍들(ex. qc = { {q0,q1}, {q0,q2}, ... })
+* 물리 노드의 간선(ex.edge = { {0,1}, {1,0}, {1,2}, {2,1}, ... }
+* =================================
+* data_preprocessor.cpp
+* data_preprocessor.cpp
+* data_preprocessor.cpp
+* 해당 인풋을 그대로 매핑과 라우팅에 쓸 수 없다.
+* 매핑과 라우팅에는 인접 노드 리스트(adj)와 거리 행렬(dist),
+* 게이트 리스트(DAG 등)가 필요하다.
+* 또한 중심도라던가 중요도는 미리 계산해 둘 수 있는 것들이므로 이것 또한 미리 계산해서 배열에 저장해 두었다.
+* 이러한 전처리 작업을 인풋이 들어왔을 때 QCompiler 객체를 생성하며 즉시 한다.
+*/
+
 #include <vector>
 #include <queue>
-#include "Quantum_circuit.h"
+#include "QCompiler.h"
 
 QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& qc, const std::vector<std::pair<int, int>>& edge)
  : num_lq(num_lq), num_pq(num_pq) {
