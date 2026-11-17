@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "Quantum_circuit.h"
+#include "QCompiler.h"
 using namespace std;
 
 int main() {
