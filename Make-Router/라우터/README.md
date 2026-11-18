@@ -1,4 +1,7 @@
-
+## 주의사항  
+문제 없다고 생각되는 것은 data_preprocessing.cpp의 인접 노드 리스트(setAdj)와 거리 행렬(setDist) 뿐입니다.  
+initial_mapping.cpp도 거의 문제 없긴 하지만, 수정 예정인 Glist와 grid를 사용하기 때문에 조금 조심할 필요가 있습니다. (사실상 문제 없긴 함. 저한테 물어보면 바로 알려드릴게요.)  
+  
 ## Files  
 |File|Description|
 |---|-----|
