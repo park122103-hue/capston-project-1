@@ -9,7 +9,7 @@
 void QCompiler::pull(int q_self, int now) {
 	if (grid[q_self][now] != -1) return;  // 오류 방지
 	if (now + 1 == T) {  // 만약 (비어있는)현재의 격자가 grid의 끝이라면 grid를 갱신한다
-        fatch(q_self);
+        fetch(q_self);
         return;
     }
 	// 현재 큐비트 q_self에 대해서 다음 게이트는 cx q_self, q_other이라면
@@ -27,7 +27,7 @@ void QCompiler::pull(int q_self, int now) {
 }
 
 // q_self의 다음 게이트를 Glist에서 당겨오기
-void QCompiler::fatch(int q_self) {
+void QCompiler::fetch(int q_self) {
 	if (grid[q_self][T - 1] != -1) return;  // 오류 방지
     if (top[q_self] >= Glist[q_self].size()) return;  // 만약 패치할 것이 Glist에 남아있지 않으면 return;
 	int q_other = Glist[q_self][top[q_self]].other;
