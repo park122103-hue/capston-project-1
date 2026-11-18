@@ -1,20 +1,3 @@
-/*
-* input: 
-* 논리 큐빗 수(num_lq)
-* 물리 큐빗 수(num_pq)
-* cx gate의 큐빗 쌍들(ex. qc = { {q0,q1}, {q0,q2}, ... })
-* 물리 노드의 간선(ex.edge = { {0,1}, {1,0}, {1,2}, {2,1}, ... }
-* output: 
-* 매핑(l2p, p2l)
-* 라우팅(routed_qc) <-- 반환형 미확정
-* =================================
-* QCompiler.h
-* QCompiler.h
-* QCompiler.h
-* 이러한 컴파일의 전단계에 대하여 하나의 클래스를 사용할 것이다.
-* 이 헤더 파일은 그러한 클래스의 정의부이다.
-*/
-
 #pragma once
 #include <vector>
 
@@ -66,7 +49,7 @@ public:
 
     // relative depth update
     void pull(int q_self, int now);
-    void fatch(int q_self);
+    void fetch(int q_self);
 
     // single routing
     void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead);
