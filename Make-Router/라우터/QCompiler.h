@@ -48,6 +48,6 @@ private:
     void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead);
     bool doGate(std::vector<std::pair<int, int>>& routed_gate);
 	// doGate가 되면 pull을 호출하고, pull이 fetch를 호출하는 구조. 그리드를 지속해서 갱신해주는 역할이다.
-    void pull(int gate_id, int now);
-    void fetch(int gate_id);
+    void pull(int q_self, int now);
+    void fetch(int q_self);
 };
