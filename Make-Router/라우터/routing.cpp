@@ -5,6 +5,7 @@
 #include <vector>
 #include "QCompiler.h"
 
+// gate_id에 해당하는 게이트가 pop 되었으므로 pull
 // 전부 당기기+Glist에서 당겨오기까지.
 void QCompiler::pull(int q_self, int now) {
 	if (grid[q_self][now] != -1) return;  // 오류 방지
@@ -14,12 +15,13 @@ void QCompiler::pull(int q_self, int now) {
     }
 	// 현재 큐비트 q_self에 대해서 다음 게이트는 cx q_self, q_other이라면
 	// 또한 q_self, q_other의 이전 grid가 모두 nop(-1)이라면, 
-	int q_other = grid[q_self][now + 1];
-	if (q_other == -1) return;
+	int next_gate_id = grid[q_self][now + 1];
+	if (next_gate_id == -1) return;
+	int q_other = (q_self != qc[next_gate_id].first) ? qc[next_gate_id].first : qc[next_gate_id].second;
 	if (grid[q_other][now] != -1) return;
 	// 게이트를 당긴다.
-	grid[q_self][now] = q_other;
-	grid[q_other][now] = q_self;
+	grid[q_self][now] = next_gate_id;
+	grid[q_other][now] = next_gate_id;
 	grid[q_self][now + 1] = -1;
 	grid[q_other][now + 1] = -1;
 	pull(q_self, now + 1);
@@ -29,13 +31,14 @@ void QCompiler::pull(int q_self, int now) {
 // q_self의 다음 게이트를 Glist에서 당겨오기
 void QCompiler::fetch(int q_self) {
 	if (grid[q_self][T - 1] != -1) return;  // 오류 방지
-    if (top[q_self] >= Glist[q_self].size()) return;  // 만약 패치할 것이 Glist에 남아있지 않으면 return;
-	int q_other = Glist[q_self][top[q_self]].other;
-    if (top[q_other] >= Glist[q_other].size()) return;  // 만약 패치할 것이 Glist에 남아있지 않으면 return;
+    if (top[q_self] >= Dlist[q_self].size()) return;  // 만약 패치할 것이 Dlist에 남아있지 않으면 return;
+	int gate_id = Dlist[q_self][top[q_self]];
+	int q_other = (q_self != qc[gate_id].first) ? qc[gate_id].first : qc[gate_id].second;
+    if (top[q_other] >= Dlist[q_other].size()) return;  // 만약 패치할 것이 Dlist에 남아있지 않으면 return;
 	if (grid[q_other][T - 1] != -1) return;  // 당겨올 수 있는지 검사하고, 
-	if (Glist[q_self][top[q_self]].id != Glist[q_other][top[q_other]].id) return;  // 해당 게이트가 아직 대기되어야 한다면 대기한다.
-	grid[q_self][T - 1] = q_other;
-	grid[q_other][T - 1] = q_self;
+	if (Dlist[q_self][top[q_self]] != Dlist[q_other][top[q_other]]) return;  // 해당 게이트가 아직 대기되어야 한다면 대기한다.
+	grid[q_self][T - 1] = gate_id;
+	grid[q_other][T - 1] = gate_id;
 	top[q_self]++;
 	top[q_other]++;
 }
@@ -51,7 +54,8 @@ double QCompiler::getCostOH(int Q_self, int Q_cand) {
 			power *= param_alpha;
 			continue;
 		}
-		int Q_other = l2p[grid[q_self][t]];
+		int gate_id = grid[q_self][t];
+		int Q_other = l2p[(q_self != qc[gate_id].first) ? qc[gate_id].first : qc[gate_id].second];
 		if (Q_other != Q_cand) {  // ohter 큐비트와 스왑하는 경우 당연히 거리 변화량은 0이라서 스킵해도 됨
 			overhead += power * (dist[Q_cand][Q_other] - dist[Q_self][Q_other]);
 		}
@@ -80,18 +84,18 @@ std::vector<std::pair<int, int>> QCompiler::routing() {
 void QCompiler::doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead) {
 	int best_Q_self = -1;
 	int best_Q_cand = -1;
-	double best_swap_overhead = 1e9;
+	double best_cost_overhead = 1e9;
 	// 스왑 대상 큐비트들은 grid 쭉 돌면 된다.
 	// 가장 오버헤드가 적은 Q_self->Q_cendi 조합을 구한다.
 	for (int q_self = 0; q_self < num_lq; q_self++) {
 		if (grid[q_self][0] == -1) continue;
 		int Q_self = l2p[q_self];
 		for (int Q_cand : adj[Q_self]) {
-			double swap_overhead = getCostOH(Q_self, Q_cand) + getCostOH(Q_cand, Q_self);
-			if (swap_overhead < best_swap_overhead) {
+			double cost_overhead = getCostOH(Q_self, Q_cand) + getCostOH(Q_cand, Q_self);
+			if (cost_overhead < best_cost_overhead) {
 				best_Q_self = Q_self;
 				best_Q_cand = Q_cand;
-				best_swap_overhead = swap_overhead;
+				best_cost_overhead = cost_overhead;
 			}
 		}
 	}
@@ -104,20 +108,22 @@ void QCompiler::doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_
 	p2l[best_Q_cand] = q_self;
 	routed_gate.push_back( { best_Q_self, best_Q_cand } );
 	routed_gate.push_back( { best_Q_cand, best_Q_self } );
-	if (q_self != -1 && q_cand != -1) routed_gate.push_back( { best_Q_self, best_Q_cand } );
+	routed_gate.push_back( { best_Q_self, best_Q_cand } );
 	swap_overhead++;
 }
 
 bool QCompiler::doGate(std::vector<std::pair<int, int>>& routed_gate) {
 	for (int q_self = 0; q_self < num_lq; q_self++) {
 		if (grid[q_self][0] == -1) continue;
-		int q_other = grid[q_self][0];
-		if (dist[l2p[q_self]][l2p[q_other]] == 1) {
-			grid[q_self][0] = -1;
-			grid[q_other][0] = -1;
-			pull(q_self, 0);
-			pull(q_other, 0);
-			routed_gate.push_back( { l2p[q_self], l2p[q_other] } );
+		int gate_id = grid[q_self][0];
+		int q_control = qc[gate_id].first;
+		int q_target = qc[gate_id].second;
+		if (dist[l2p[q_control]][l2p[q_target]] == 1) {
+			grid[q_control][0] = -1;
+			grid[q_target][0] = -1;
+			pull(q_control, 0);
+			pull(q_target, 0);
+			routed_gate.push_back( { l2p[q_control], l2p[q_target] } );
 			return true;
 		}
 	}

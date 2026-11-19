@@ -20,13 +20,12 @@
 #include "QCompiler.h"
 
 QCompiler::QCompiler(int num_lq, int num_pq, const std::vector<std::pair<int, int>>& qc, const std::vector<std::pair<int, int>>& edge)
- : num_lq(num_lq), num_pq(num_pq) {
-    // 
+ : num_lq(num_lq), num_pq(num_pq), qc(qc) {
     T = 10;
     param_alpha = 0.8;
     setAdj(edge);
     setDist();
-    setGlist(qc);
+    setDlist(qc);
     setGrid();
     // for mapping
     l2p.assign(num_lq, -1);
@@ -87,14 +86,14 @@ void QCompiler::setDist() {
 }
 
 
-void QCompiler::setGlist(const std::vector<std::pair<int, int>>& gates) {
+void QCompiler::setDlist(const std::vector<std::pair<int, int>>& qc) {
     top.assign(num_lq, 0);
-    Glist.assign(num_lq, std::vector<G>());
-    for (int id = 0; id < gates.size(); id++) {
-        std::pair<int, int> g = gates[id];
-        if (g.first == -1) continue;
-        Glist[g.first].push_back({ g.second, id });
-        Glist[g.second].push_back({ g.first, id });
+    Dlist.assign(num_lq, std::vector<int>());
+    for (int id = 0; id < qc.size(); id++) {
+        std::pair<int, int> gate = qc[id];
+        if (gate.first == -1) continue;
+        Dlist[gate.first].push_back(id);
+        Dlist[gate.second].push_back(id);
     }
 }
 
@@ -104,21 +103,23 @@ void QCompiler::setGrid() {
     do {
         progress = false;
         for (int q_self = 0; q_self < num_lq; q_self++) {
-            // Has the Glist scan been completed?
-            if (top[q_self] >= Glist[q_self].size()) continue;
-            int q_other = Glist[q_self][top[q_self]].other;
-            if (top[q_other] >= Glist[q_other].size()) continue;
+            // Has the Dlist scan been completed?
+            if (top[q_self] >= Dlist[q_self].size()) continue;
+            int gate_id = Dlist[q_self][top[q_self]];
+            int q_control = qc[gate_id].first;
+            int q_target = qc[gate_id].second;
+            if (top[q_control] >= Dlist[q_control].size() || top[q_target] >= Dlist[q_target].size()) continue;
             // Conditions for not being able to "push"
-            if (Glist[q_self][top[q_self]].id != Glist[q_other][top[q_other]].id) continue;
-            if (grid[q_self].size() >= T || grid[q_other].size() >= T) continue;
+            if (Dlist[q_control][top[q_control]] != gate_id || Dlist[q_target][top[q_target]] != gate_id) continue;
+            if (grid[q_control].size() >= T || grid[q_target].size() >= T) continue;
             // push bubble
-            if (grid[q_self].size() < grid[q_other].size()) grid[q_self].resize(grid[q_other].size(), -1);
-            if (grid[q_self].size() > grid[q_other].size()) grid[q_other].resize(grid[q_self].size(), -1);
+            if (grid[q_control].size() < grid[q_target].size()) grid[q_control].resize(grid[q_target].size(), -1);
+            if (grid[q_control].size() > grid[q_target].size()) grid[q_target].resize(grid[q_control].size(), -1);
             // push gate
-            grid[q_self].push_back(q_other);
-            grid[q_other].push_back(q_self);
-            top[q_self]++;
-            top[q_other]++;
+            grid[q_control].push_back(gate_id);
+            grid[q_target].push_back(gate_id);
+            top[q_control]++;
+            top[q_target]++;
             progress = true;
         }
     } while (progress);

@@ -1,10 +1,5 @@
 #pragma once
 #include <vector>
-// 게이트를 표현하는 구조체. other는 cx의 상대 큐비트. ID는 해당 게이트의 번호(게이트 순서)를 뜻함. 
-struct G {
-    int other;
-    int id;
-};
 
 class QCompiler {
 public:
@@ -18,9 +13,10 @@ private:
     std::vector<std::vector<int>> adj;
 	// 논리 큐비트
     const int num_lq;
+    const std::vector<std::pair<int, int>>& qc;
     int T;
     std::vector<int> top;
-    std::vector<std::vector<G>> Glist;
+    std::vector<std::vector<int>> Dlist;
     std::vector<std::vector<int>> grid;
 	// 매핑
     std::vector<int> l2p;
@@ -31,7 +27,7 @@ private:
 	// @SET 계열
     void setAdj(const std::vector<std::pair<int, int>>& edge);
     void setDist();
-    void setGlist(const std::vector<std::pair<int, int>>& gates);
+    void setDlist(const std::vector<std::pair<int, int>>& qc);
     void setGrid();
     // Damping ratio
     double param_alpha = 0.8;
@@ -52,6 +48,6 @@ private:
     void doSWAP(std::vector<std::pair<int, int>>& routed_gate, int& swap_overhead);
     bool doGate(std::vector<std::pair<int, int>>& routed_gate);
 	// doGate가 되면 pull을 호출하고, pull이 fetch를 호출하는 구조. 그리드를 지속해서 갱신해주는 역할이다.
-    void pull(int q_self, int now);
-    void fetch(int q_self);
+    void pull(int gate_id, int now);
+    void fetch(int gate_id);
 };
