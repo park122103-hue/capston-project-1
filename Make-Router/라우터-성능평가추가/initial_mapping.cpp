@@ -1,4 +1,4 @@
-﻿/*
+/*
 * initial_mapper.cpp
 * initial_mapper.cpp
 * initial_mapper.cpp
@@ -70,12 +70,12 @@ int QCompiler::getBestQ() const {
 	return best_q;
 }
 // 아직 짝지어지지 않은 물리 큐비트들 중 하나를 뽑는다. --> C(x)가 가장 작은 x를 뽑는다. 
-int QCompiler::getBestP(int best_p) {
+int QCompiler::getBestP(int best_lq) {
 	int best_Q = -1;
 	double min_cost = -1;
 	for (int Q_cand = 0; Q_cand < num_pq; Q_cand++) {
 		if (p2l[Q_cand] != -1) continue;
-		double cost = getCost(best_p, Q_cand);
+		double cost = getCost(best_lq, Q_cand);
 		if (min_cost == -1 || cost < min_cost) {
 			best_Q = Q_cand;
 			min_cost = cost;
